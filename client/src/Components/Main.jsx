@@ -65,16 +65,16 @@ export default function NavTabs() {
     const [data, setData] = React.useState(null);
 
     React.useEffect(() => {
-        fetch('/one')
+        fetch('/item/post-item')
             .then((result) => (result.json()))
-            .then((data) => setData(data.name))
+            .then((data) => setData(data.name.name))
         fetch('/two')
             .then((result) => (result.json()))
             .then((data) => setData(data.name))
         fetch('/three')
             .then((result) => (result.json()))
             .then((data) => setData(data.name))
-    });
+    }, []);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
