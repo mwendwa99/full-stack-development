@@ -1,114 +1,84 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
-function TabPanel(props) {
-    const { children, value, index, ...other } = props;
+const getUrl = 'http://localhost:5000/item/get-item';
+const postUrl = 'http://localhost:5000/item/post-item';
 
-    return (
-        <div
-            role="tabpanel"
-            hidden={value !== index}
-            id={`nav-tabpanel-${index}`}
-            aria-labelledby={`nav-tab-${index}`}
-            {...other}
-        >
-            {value === index && (
-                <Box p={3}>
-                    <Typography>{children}</Typography>
-                </Box>
-            )}
-        </div>
-    );
-}
+// get with axios
+// axios.get(`${url}`)
+//     .then((result) => { console.log(result) })
+//     .catch((error) => { console.log(`iko sida mahali pwana ${error}`) });
 
-TabPanel.propTypes = {
-    children: PropTypes.node,
-    index: PropTypes.any.isRequired,
-    value: PropTypes.any.isRequired,
-};
+const Main = () => {
 
-function a11yProps(index) {
-    return {
-        id: `nav-tab-${index}`,
-        'aria-controls': `nav-tabpanel-${index}`,
-    };
-}
+    const [items, setItems] = useState([]);
+    const [name, setName] = useState('');
+    const [quant, setQuant] = useState('');
+    const [desc, setDesc] = useState('');
 
-function LinkTab(props) {
-    return (
-        <Tab
-            component="a"
-            onClick={(event) => {
-                event.preventDefault();
-            }}
-            {...props}
-        />
-    );
-}
-
-const useStyles = makeStyles((theme) => ({
-    root: {
-        flexGrow: 1,
-        backgroundColor: theme.palette.background.paper,
-    },
-}));
-
-export default function NavTabs() {
-    const classes = useStyles();
-    const [value, setValue] = React.useState(0);
-    const [data, setData] = React.useState(null);
-
-    React.useEffect(() => {
-        fetch('/item/post-item')
-            .then((result) => (result.json()))
-            .then((data) => setData(data.name.name))
-        fetch('/two')
-            .then((result) => (result.json()))
-            .then((data) => setData(data.name))
-        fetch('/three')
-            .then((result) => (result.json()))
-            .then((data) => setData(data.name))
+    // get
+    useEffect(() => {
+        axios.get(`${getUrl}`)
+            .then(result => {
+                const arr = result.data;
+                setItems(arr)
+            })
+            // log errorsx 
+            .catch((error) => console.log(`err in fetch ${error}`))
     }, []);
 
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
+
+    // post
+    const onSubmit = async (e) => {
+        e.preventDefault();
+
+        const formData = {
+            name: name,
+            quantity: quant,
+            description: desc
+        }
+        console.log(formData)
+
+        await axios.post(`${postUrl}`, formData)
+            .then((res) => {
+                console.log(res)
+                setName(name);
+                setQuant(quant);
+                setDesc(desc);
+            })
+            .catch((err) => console.log(`error in post ${err}`))
+    }
 
     return (
-        <div className={classes.root}>
-            <AppBar position="static">
-                <Tabs
-                    variant="fullWidth"
-                    value={value}
-                    onChange={handleChange}
-                    aria-label="nav tabs example"
-                >
-                    <LinkTab label="Page One" href="/drafts" {...a11yProps(0)} />
-                    <LinkTab label="Page Two" href="/trash" {...a11yProps(1)} />
-                    <LinkTab label="Page Three" href="/spam" {...a11yProps(2)} />
-                </Tabs>
-            </AppBar>
-            <TabPanel value={value} index={0}>
-                <Typography variant='h1'>
-                    {!data ? "Loading page 1..." : data}
-                </Typography>
-            </TabPanel>
-            <TabPanel value={value} index={1}>
-                <Typography variant='h1'>
-                    {!data ? "Loading page 2..." : data}
-                </Typography>
-            </TabPanel>
-            <TabPanel value={value} index={2}>
-                <Typography variant='h1'>
-                    {!data ? 'Loading page 3...' : data}
-                </Typography>
-            </TabPanel>
-        </div>
-    );
+        <nav>
+            <form onSubmit={onSubmit}>
+                <label> name:
+                    <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder='name' />
+                </label>
+                <label > quatity:
+                    <input type="number" value={quant} onChange={e => setQuant(e.target.value)} placeholder='quant' />
+                </label>
+                <label > description
+                    <input type="text" value={desc} onChange={e => setDesc(e.target.value)} placeholder='desc' />
+                </label>
+                <button type="submit"> POST </button>
+            </form>
+            {
+                items.map((item) =>
+                    <ul key={item._id} >
+                        <p> <strong> id: {!item._id ? "loading id" : item._id} </strong></p>
+                        <li> name: {!item.name ? "loading..." : item.name} </li>
+                        <ol>
+                            <li > quantity: {item.quantity}  </li>
+                            <li > description: {item.description}  </li>
+                            <li > created at: {item.createdAt}  </li>
+                            <li > updated at: {item.updatedAt}  </li>
+                        </ol>
+                    </ul>
+                )
+            }
+        </nav>
+    )
 }
+
+export default Main
