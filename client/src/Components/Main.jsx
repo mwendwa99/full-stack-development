@@ -31,24 +31,18 @@ const Main = () => {
     // post
     const onSubmit = async (e) => {
         e.preventDefault();
-
         const formData = {
             name: name,
             quantity: quant,
-            description: desc
+            description: desc,
         }
         console.log(formData)
-
         await axios.post(`${postUrl}`, formData)
             .then((res) => {
-                console.log(res)
-                setName(name);
-                setQuant(quant);
-                setDesc(desc);
+                console.log(res.data)
             })
             .catch((err) => console.log(`error in post ${err}`))
     }
-
     return (
         <nav>
             <form onSubmit={onSubmit}>

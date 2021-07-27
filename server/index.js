@@ -4,6 +4,9 @@ const itemRoutes = require('./routes/ItemRoute');
 const cors = require('cors');;
 const bodyParser = require('body-parser');
 
+// mongoose promise
+mongoose.Promise = global.Promise;
+
 const app = express();
 const PORT = 5000;
 const uri = 'mongodb://127.0.0.1:27017/test';
