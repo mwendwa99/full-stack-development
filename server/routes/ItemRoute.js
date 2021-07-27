@@ -8,7 +8,6 @@ router.route('/post-item').post((req, res, next) => {
         if (error) {
             return next(error)
         } else {
-            console.log(`data from frontend: ${data}`)
             res.json(data)
         }
     })
@@ -24,8 +23,15 @@ router.route('/get-item').get((req, res) => {
 // find by ID
 router.route('item/:id').get((req, res) => {
     Item.findByID(req.params.id)
-        .then((res) => res.send(result))
+        .then((result) => res.send(result))
         .catch((err) => console.log(`error in findById: ${err}`))
+});
+
+// delete by ID
+router.route('delete/:id').delete((req, res) => {
+    Item.findByIdAndRemove(req.params.id)
+        .then((result) => res.send(result))
+        .catch((err) => console.log(`error in deleteById: ${err}`))
 })
 
 module.exports = router;

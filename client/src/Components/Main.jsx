@@ -3,6 +3,7 @@ import axios from 'axios';
 
 const getUrl = 'http://localhost:5000/item/get-item';
 const postUrl = 'http://localhost:5000/item/post-item';
+const delUrl = 'http://localhost:5000/item/delete';
 
 // get with axios
 // axios.get(`${url}`)
@@ -15,6 +16,7 @@ const Main = () => {
     const [name, setName] = useState('');
     const [quant, setQuant] = useState('');
     const [desc, setDesc] = useState('');
+    const [id, setId] = useState();
 
     // get
     useEffect(() => {
@@ -22,16 +24,26 @@ const Main = () => {
             .then(result => {
                 const arr = result.data;
                 setItems(arr)
+                setId(arr[0]._id)
+                console.log(arr[0]._id)
             })
             // log errorsx 
             .catch((error) => console.log(`err in fetch ${error}`))
     }, []);
 
+    // delete
+    const deleteItem = async () => {
+
+        await axios.delete(`${delUrl}/${id}`)
+            .then((result) => console.log(`success in deleting user!: ${result.data}`))
+            .catch((error) => console.log(`error in delete user!: ${error}`))
+    }
 
     // post
     const onSubmit = async (e) => {
         e.preventDefault();
         const formData = {
+            _id: id,
             name: name,
             quantity: quant,
             description: desc,
@@ -61,7 +73,10 @@ const Main = () => {
                 items.map((item) =>
                     <ul key={item._id} >
                         <p> <strong> id: {!item._id ? "loading id" : item._id} </strong></p>
-                        <li> name: {!item.name ? "loading..." : item.name} </li>
+                        <li>
+                            name: {!item.name ? "loading..." : item.name}
+                            <button onClick={deleteItem}> delete</button>
+                        </li>
                         <ol>
                             <li > quantity: {item.quantity}  </li>
                             <li > description: {item.description}  </li>
