@@ -1,6 +1,13 @@
 const express = require('express');
 const Item = require('../model/ItemModel');
 const router = express.Router();
+const cors = require('cors');
+
+// cors options
+var corsOptions = {
+    origin: 'http://localhost:3000/',
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
 
 // post item from frontend
 router.route('/post-item').post((req, res, next) => {

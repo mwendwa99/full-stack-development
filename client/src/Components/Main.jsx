@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const getUrl = 'http://localhost:5000/item/get-item';
 const postUrl = 'http://localhost:5000/item/post-item';
-const delUrl = 'http://localhost:5000/item/delete';
+// const delUrl = 'http://localhost:5000/item/delete';
 
 // get with axios
 // axios.get(`${url}`)
@@ -22,39 +22,45 @@ const Main = () => {
     useEffect(() => {
         axios.get(`${getUrl}`)
             .then(result => {
-                const arr = result.data;
-                setItems(arr)
-                setId(arr[0]._id)
-                console.log(arr[0]._id)
+                const items = result.data;
+                setItems(items)
+                console.log(items)
+                // setId(arr[0]._id)
+                // console.log(arr[0]._id)
             })
             // log errorsx 
             .catch((error) => console.log(`err in fetch ${error}`))
     }, []);
 
     // delete
-    const deleteItem = async () => {
+    const deleteItem = async (id, e) => {
 
-        await axios.delete(`${delUrl}/${id}`)
+        console.log(id)
+        await axios.delete(`http://localhost:5000/item/delete/${id}`)
             .then((result) => console.log(`success in deleting user!: ${result.data}`))
-            .catch((error) => console.log(`error in delete user!: ${error}`))
+            .catch((error) => console.log(`error in delete user!: ${error}`));
+
+        // const items = this.state.items.filter(item => item.id !== id);
+        // setItems(items);
     }
 
     // post
-    const onSubmit = async (e) => {
+    const onSubmit = (e) => {
         e.preventDefault();
         const formData = {
-            _id: id,
             name: name,
             quantity: quant,
             description: desc,
         }
         console.log(formData)
-        await axios.post(`${postUrl}`, formData)
+    }
+    useEffect((formData) => {
+        axios.post(`${postUrl}`, formData)
             .then((res) => {
                 console.log(res.data)
             })
             .catch((err) => console.log(`error in post ${err}`))
-    }
+    }, [])
     return (
         <nav>
             <form onSubmit={onSubmit}>
@@ -75,7 +81,7 @@ const Main = () => {
                         <p> <strong> id: {!item._id ? "loading id" : item._id} </strong></p>
                         <li>
                             name: {!item.name ? "loading..." : item.name}
-                            <button onClick={deleteItem}> delete</button>
+                            <button onClick={e => deleteItem(item._id, e)}> delete</button>
                         </li>
                         <ol>
                             <li > quantity: {item.quantity}  </li>
